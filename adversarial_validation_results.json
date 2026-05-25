@@ -1,0 +1,51 @@
+{
+  "test_suite": "adversarial_validation",
+  "timestamp": "2026-05-25T13:49:08.665663+00:00",
+  "objective": "Validate resilience under adversarial conditions",
+  "tests": [
+    {
+      "test_name": "malformed_contract",
+      "description": "Attempt to process malformed contract",
+      "expected": "REJECTION_WITH_LOGGING",
+      "rejected_safely": true,
+      "rejection_reason": "Missing required fields: ['trace_id', 'execution_plan', 'contract_hash']"
+    },
+    {
+      "test_name": "trace_corruption",
+      "description": "Attempt to use corrupted trace ID",
+      "expected": "DETECTION_WITH_REJECTION",
+      "rejected_safely": true,
+      "rejection_reason": "Artifact hash mismatch detected"
+    },
+    {
+      "test_name": "replay_poisoning",
+      "description": "Attempt to inject malicious artifact into replay chain",
+      "expected": "PREVENTION_WITH_REJECTION",
+      "rejected_safely": true,
+      "rejection_reason": "Parent hash mismatch - replay poisoning detected"
+    },
+    {
+      "test_name": "schema_mutation",
+      "description": "Attempt to use mutated schema version",
+      "expected": "REJECTION_WITH_LOGGING",
+      "rejected_safely": true,
+      "rejection_reason": "Invalid schema version; Undeclared fields: {'undeclared_field'}"
+    },
+    {
+      "test_name": "unauthorized_execution",
+      "description": "Attempt execution without authority approval",
+      "expected": "BLOCKED_BY_GATE",
+      "rejected_safely": true,
+      "rejection_reason": "Gate blocked execution: unauthorized_module_access"
+    },
+    {
+      "test_name": "duplicate_trace_replay",
+      "description": "Attempt to replay same trace twice",
+      "expected": "HANDLED_GRACEFULLY",
+      "rejected_safely": true,
+      "rejection_reason": "Duplicate replay handled - same hash produced (deterministic)"
+    }
+  ],
+  "constitutional_resilience": true,
+  "rejections_logged": 6
+}

@@ -1,0 +1,321 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "InsightFlow Event Schema",
+  "version": "1.0.0",
+  "description": "Canonical event schema for InsightFlow telemetry system",
+  "frozen": true,
+  
+  "definitions": {
+    "base_event": {
+      "type": "object",
+      "required": [
+        "insightflow_version",
+        "event_type",
+        "component",
+        "status",
+        "timestamp"
+      ],
+      "properties": {
+        "insightflow_version": {
+          "type": "string",
+          "const": "1.0.0",
+          "description": "InsightFlow schema version"
+        },
+        "event_type": {
+          "type": "string",
+          "description": "Event type identifier"
+        },
+        "component": {
+          "type": "string",
+          "enum": [
+            "core_integrator",
+            "prompt_runner",
+            "creator_core",
+            "bhiv_core",
+            "cet_compiler",
+            "sarathi",
+            "execution_gate",
+            "bucket",
+            "artifact_graph",
+            "replay_engine",
+            "reconstruction_engine"
+          ],
+          "description": "Component generating the event"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["success", "error", "rejected", "pending", "completed"],
+          "description": "Event status"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp"
+        },
+        "details": {
+          "type": "object",
+          "description": "Event-specific details"
+        },
+        "integration_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Integration health score"
+        },
+        "failing_components": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of failing components"
+        }
+      },
+      "additionalProperties": false
+    },
+    
+    "trace_event": {
+      "allOf": [
+        {"$ref": "#/definitions/base_event"},
+        {
+          "properties": {
+            "details": {
+              "type": "object",
+              "required": ["trace_id", "instruction_id"],
+              "properties": {
+                "trace_id": {
+                  "type": "string",
+                  "description": "Global trace identifier"
+                },
+                "instruction_id": {
+                  "type": "string",
+                  "description": "Creator Core instruction ID"
+                },
+                "execution_id": {
+                  "type": "string",
+                  "description": "Execution ID"
+                },
+                "trace_context": {
+                  "type": "object",
+                  "description": "Full trace context"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    
+    "artifact_event": {
+      "allOf": [
+        {"$ref": "#/definitions/base_event"},
+        {
+          "properties": {
+            "details": {
+              "type": "object",
+              "required": ["artifact_id", "artifact_type", "trace_id"],
+              "properties": {
+                "artifact_id": {
+                  "type": "string",
+                  "description": "Artifact identifier"
+                },
+                "artifact_type": {
+                  "type": "string",
+                  "enum": ["instruction", "blueprint", "contract", "execution", "result"],
+                  "description": "Artifact type"
+                },
+                "trace_id": {
+                  "type": "string",
+                  "description": "Global trace identifier"
+                },
+                "artifact_hash": {
+                  "type": "string",
+                  "description": "Artifact hash"
+                },
+                "parent_artifact_id": {
+                  "type": "string",
+                  "description": "Parent artifact ID for lineage"
+                },
+                "artifact_graph_context": {
+                  "type": "object",
+                  "description": "Full artifact graph context"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    
+    "authority_event": {
+      "allOf": [
+        {"$ref": "#/definitions/base_event"},
+        {
+          "properties": {
+            "details": {
+              "type": "object",
+              "required": ["contract_id", "allowed"],
+              "properties": {
+                "contract_id": {
+                  "type": "string",
+                  "description": "Contract identifier"
+                },
+                "allowed": {
+                  "type": "boolean",
+                  "description": "Authority decision"
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Decision reason"
+                },
+                "decision_id": {
+                  "type": "string",
+                  "description": "Decision identifier"
+                },
+                "validation_checks": {
+                  "type": "object",
+                  "description": "Validation check results"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    
+    "gate_event": {
+      "allOf": [
+        {"$ref": "#/definitions/base_event"},
+        {
+          "properties": {
+            "details": {
+              "type": "object",
+              "required": ["contract_id", "gate_status"],
+              "properties": {
+                "contract_id": {
+                  "type": "string",
+                  "description": "Contract identifier"
+                },
+                "trace_id": {
+                  "type": "string",
+                  "description": "Global trace identifier"
+                },
+                "gate_status": {
+                  "type": "string",
+                  "enum": ["ALLOWED", "REJECTED", "EXECUTED", "FAILED"],
+                  "description": "Gate decision status"
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Gate decision reason"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    
+    "replay_event": {
+      "allOf": [
+        {"$ref": "#/definitions/base_event"},
+        {
+          "properties": {
+            "details": {
+              "type": "object",
+              "required": ["instruction_id", "replay_status"],
+              "properties": {
+                "instruction_id": {
+                  "type": "string",
+                  "description": "Instruction ID being replayed"
+                },
+                "replay_status": {
+                  "type": "string",
+                  "enum": ["started", "completed", "failed"],
+                  "description": "Replay status"
+                },
+                "hash_match": {
+                  "type": "boolean",
+                  "description": "Whether replay hash matches original"
+                },
+                "determinism_score": {
+                  "type": "number",
+                  "description": "Determinism score (0-1)"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    
+    "failure_event": {
+      "allOf": [
+        {"$ref": "#/definitions/base_event"},
+        {
+          "properties": {
+            "status": {"const": "error"},
+            "details": {
+              "type": "object",
+              "required": ["error_type", "error_message"],
+              "properties": {
+                "error_type": {
+                  "type": "string",
+                  "description": "Error type"
+                },
+                "error_message": {
+                  "type": "string",
+                  "description": "Error message"
+                },
+                "trace_id": {
+                  "type": "string",
+                  "description": "Associated trace ID"
+                },
+                "recoverable": {
+                  "type": "boolean",
+                  "description": "Whether error is recoverable"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  
+  "event_types": {
+    "trace.started": {"$ref": "#/definitions/trace_event"},
+    "trace.completed": {"$ref": "#/definitions/trace_event"},
+    "trace.failed": {"$ref": "#/definitions/trace_event"},
+    
+    "artifact.created": {"$ref": "#/definitions/artifact_event"},
+    "artifact.rejected": {"$ref": "#/definitions/artifact_event"},
+    "artifact.retrieved": {"$ref": "#/definitions/artifact_event"},
+    
+    "authority.decision": {"$ref": "#/definitions/authority_event"},
+    "authority.validation_failed": {"$ref": "#/definitions/authority_event"},
+    
+    "gate.decision": {"$ref": "#/definitions/gate_event"},
+    "gate.executed": {"$ref": "#/definitions/gate_event"},
+    "gate.rejected": {"$ref": "#/definitions/gate_event"},
+    
+    "replay.started": {"$ref": "#/definitions/replay_event"},
+    "replay.completed": {"$ref": "#/definitions/replay_event"},
+    "replay.failed": {"$ref": "#/definitions/replay_event"},
+    
+    "execution.failed": {"$ref": "#/definitions/failure_event"},
+    "schema.validation_failed": {"$ref": "#/definitions/failure_event"}
+  },
+  
+  "telemetry_targets": {
+    "insightflow": {
+      "description": "Primary telemetry destination",
+      "required_fields": ["event_type", "component", "timestamp"]
+    },
+    "bucket": {
+      "description": "Artifact storage telemetry",
+      "required_fields": ["artifact_id", "trace_id", "timestamp"]
+    },
+    "audit_log": {
+      "description": "Audit logging for compliance",
+      "required_fields": ["event_type", "user_id", "timestamp"]
+    }
+  }
+}

@@ -1,0 +1,321 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BHIV Canonical Artifact Schema",
+  "version": "1.0.0-FINAL",
+  "description": "Immutable canonical artifact chain schema for TANTRA execution spine",
+  "frozen": true,
+  "last_modified": "2025-01-15T00:00:00Z",
+  
+  "definitions": {
+    "base_artifact": {
+      "type": "object",
+      "required": [
+        "artifact_id",
+        "artifact_type",
+        "trace_id",
+        "instruction_id",
+        "schema_version",
+        "timestamp",
+        "artifact_hash",
+        "payload"
+      ],
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^artifact_[a-z]+_[a-f0-9]{8}$",
+          "description": "Deterministic artifact identifier"
+        },
+        "artifact_type": {
+          "type": "string",
+          "enum": ["instruction", "blueprint", "contract", "execution", "result"],
+          "description": "Canonical artifact type - IMMUTABLE"
+        },
+        "trace_id": {
+          "type": "string",
+          "pattern": "^(inst_|trace_)[a-zA-Z0-9_-]+$",
+          "description": "Trace identifier - MUST be consistent across chain"
+        },
+        "instruction_id": {
+          "type": "string",
+          "pattern": "^inst_[a-zA-Z0-9_-]+$",
+          "description": "Instruction identifier - MUST match trace_id"
+        },
+        "schema_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+(-FINAL)?$",
+          "description": "Schema version - MUST be present"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp"
+        },
+        "artifact_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash of canonical payload"
+        },
+        "parent_artifact_id": {
+          "type": "string",
+          "pattern": "^artifact_[a-z]+_[a-f0-9]{8}$",
+          "description": "Parent artifact in chain - REQUIRED except for instruction"
+        },
+        "parent_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Parent artifact hash - REQUIRED except for instruction"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Artifact-specific payload"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Optional metadata - MUST NOT affect hash"
+        }
+      },
+      "additionalProperties": false
+    },
+    
+    "instruction_artifact": {
+      "allOf": [
+        { "$ref": "#/definitions/base_artifact" },
+        {
+          "properties": {
+            "artifact_type": { "const": "instruction" },
+            "payload": {
+              "type": "object",
+              "required": ["origin", "intent_type", "target_product", "instruction_data"],
+              "properties": {
+                "origin": {
+                  "type": "string",
+                  "enum": ["prompt_runner", "creator_core", "external"],
+                  "description": "Instruction origin"
+                },
+                "intent_type": {
+                  "type": "string",
+                  "description": "Intent classification"
+                },
+                "target_product": {
+                  "type": "string",
+                  "enum": ["creator", "ttg", "ttv", "finance", "education"],
+                  "description": "Target product"
+                },
+                "instruction_data": {
+                  "type": "object",
+                  "description": "Instruction-specific data"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+    
+    "blueprint_artifact": {
+      "allOf": [
+        { "$ref": "#/definitions/base_artifact" },
+        {
+          "properties": {
+            "artifact_type": { "const": "blueprint" },
+            "parent_artifact_id": { "type": "string" },
+            "parent_hash": { "type": "string" },
+            "payload": {
+              "type": "object",
+              "required": ["blueprint_id", "instruction_reference", "blueprint_data"],
+              "properties": {
+                "blueprint_id": {
+                  "type": "string",
+                  "description": "Blueprint identifier"
+                },
+                "instruction_reference": {
+                  "type": "string",
+                  "description": "Reference to instruction artifact"
+                },
+                "blueprint_data": {
+                  "type": "object",
+                  "description": "Blueprint-specific data"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["parent_artifact_id", "parent_hash"]
+        }
+      ]
+    },
+    
+    "contract_artifact": {
+      "allOf": [
+        { "$ref": "#/definitions/base_artifact" },
+        {
+          "properties": {
+            "artifact_type": { "const": "contract" },
+            "parent_artifact_id": { "type": "string" },
+            "parent_hash": { "type": "string" },
+            "payload": {
+              "type": "object",
+              "required": ["contract_id", "execution_plan", "constraints", "contract_hash"],
+              "properties": {
+                "contract_id": {
+                  "type": "string",
+                  "pattern": "^contract_[a-f0-9]{12}$",
+                  "description": "CET-generated contract ID"
+                },
+                "execution_plan": {
+                  "type": "object",
+                  "required": ["target_module", "execution_intent", "execution_data"],
+                  "properties": {
+                    "target_module": { "type": "string" },
+                    "execution_intent": { "type": "string" },
+                    "execution_data": { "type": "object" }
+                  },
+                  "additionalProperties": false
+                },
+                "constraints": {
+                  "type": "object",
+                  "required": ["deterministic", "replay_safe"],
+                  "properties": {
+                    "deterministic": { "type": "boolean", "const": true },
+                    "replay_safe": { "type": "boolean", "const": true }
+                  }
+                },
+                "contract_hash": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$",
+                  "description": "Deterministic contract hash"
+                },
+                "authority_decision": {
+                  "type": "object",
+                  "required": ["allowed", "reason", "decision_id"],
+                  "properties": {
+                    "allowed": { "type": "boolean" },
+                    "reason": { "type": "string" },
+                    "decision_id": { "type": "string" }
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["parent_artifact_id", "parent_hash"]
+        }
+      ]
+    },
+    
+    "execution_artifact": {
+      "allOf": [
+        { "$ref": "#/definitions/base_artifact" },
+        {
+          "properties": {
+            "artifact_type": { "const": "execution" },
+            "parent_artifact_id": { "type": "string" },
+            "parent_hash": { "type": "string" },
+            "payload": {
+              "type": "object",
+              "required": ["execution_id", "contract_reference", "gate_status", "execution_envelope"],
+              "properties": {
+                "execution_id": {
+                  "type": "string",
+                  "pattern": "^exec_[a-f0-9]{16}$",
+                  "description": "Execution identifier"
+                },
+                "contract_reference": {
+                  "type": "string",
+                  "description": "Reference to contract artifact"
+                },
+                "gate_status": {
+                  "type": "string",
+                  "enum": ["EXECUTED", "REJECTED", "FAILED"],
+                  "description": "Gate decision status"
+                },
+                "execution_envelope": {
+                  "type": "object",
+                  "required": ["input_hash", "output_hash", "duration_ms"],
+                  "properties": {
+                    "input_hash": { "type": "string" },
+                    "output_hash": { "type": "string" },
+                    "duration_ms": { "type": "number" }
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["parent_artifact_id", "parent_hash"]
+        }
+      ]
+    },
+    
+    "result_artifact": {
+      "allOf": [
+        { "$ref": "#/definitions/base_artifact" },
+        {
+          "properties": {
+            "artifact_type": { "const": "result" },
+            "parent_artifact_id": { "type": "string" },
+            "parent_hash": { "type": "string" },
+            "payload": {
+              "type": "object",
+              "required": ["status", "result_data", "deterministic_hash"],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["success", "error", "rejected"],
+                  "description": "Final execution status"
+                },
+                "result_data": {
+                  "type": "object",
+                  "description": "Final result payload"
+                },
+                "deterministic_hash": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$",
+                  "description": "Deterministic result hash for replay validation"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["parent_artifact_id", "parent_hash"]
+        }
+      ]
+    }
+  },
+  
+  "canonical_chain": {
+    "description": "Immutable canonical artifact chain",
+    "sequence": [
+      "instruction",
+      "blueprint",
+      "contract",
+      "execution",
+      "result"
+    ],
+    "rules": {
+      "trace_id_consistency": "MUST be identical across all artifacts in chain",
+      "parent_linkage": "Each artifact MUST reference parent via parent_artifact_id and parent_hash",
+      "schema_version": "MUST be present in every artifact",
+      "deterministic_serialization": "Canonical JSON serialization with sorted keys",
+      "no_undeclared_fields": "additionalProperties: false enforced",
+      "immutable_types": "artifact_type enum is FROZEN"
+    }
+  },
+  
+  "validation_rules": {
+    "hash_generation": {
+      "algorithm": "SHA-256",
+      "input": "Canonical JSON with sorted keys, excluding metadata",
+      "deterministic": true
+    },
+    "parent_validation": {
+      "required": "All artifacts except instruction MUST have parent_artifact_id and parent_hash",
+      "verification": "Parent hash MUST match stored parent artifact hash"
+    },
+    "trace_consistency": {
+      "rule": "trace_id MUST NOT change within chain",
+      "enforcement": "Runtime validation on artifact creation"
+    }
+  }
+}

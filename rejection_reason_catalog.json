@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-05-25T13:49:08.667709+00:00",
+  "total_rejections": 6,
+  "rejection_reasons": [
+    "Parent hash mismatch - replay poisoning detected",
+    "Missing required fields: ['trace_id', 'execution_plan', 'contract_hash']",
+    "Gate blocked execution: unauthorized_module_access",
+    "Artifact hash mismatch detected",
+    "Handled deterministically",
+    "Invalid schema version; Undeclared fields: {'undeclared_field'}"
+  ],
+  "rejection_log": [
+    {
+      "timestamp": "2026-05-25T13:49:08.665695+00:00",
+      "test": "malformed_contract",
+      "reason": "Missing required fields: ['trace_id', 'execution_plan', 'contract_hash']",
+      "payload_summary": "{'contract_id': 'contract_malformed_test', 'invalid_field': 'should_not_be_accepted'}"
+    },
+    {
+      "timestamp": "2026-05-25T13:49:08.665789+00:00",
+      "test": "trace_corruption",
+      "reason": "Artifact hash mismatch detected",
+      "payload_summary": "{'artifact_id': 'artifact_instruction_corrupt', 'artifact_type': 'instruction', 'trace_id': 'trace_c"
+    },
+    {
+      "timestamp": "2026-05-25T13:49:08.665832+00:00",
+      "test": "replay_poisoning",
+      "reason": "Parent hash mismatch - replay poisoning detected",
+      "payload_summary": "{'artifact_id': 'artifact_blueprint_poisoned', 'artifact_type': 'blueprint', 'parent_artifact_id': '"
+    },
+    {
+      "timestamp": "2026-05-25T13:49:08.665859+00:00",
+      "test": "schema_mutation",
+      "reason": "Invalid schema version; Undeclared fields: {'undeclared_field'}",
+      "payload_summary": "{'artifact_id': 'artifact_instruction_mutated', 'artifact_type': 'instruction', 'trace_id': 'trace_m"
+    },
+    {
+      "timestamp": "2026-05-25T13:49:08.665878+00:00",
+      "test": "unauthorized_execution",
+      "reason": "Gate blocked execution: unauthorized_module_access",
+      "payload_summary": "{'contract_id': 'contract_unauthorized', 'trace_id': 'trace_unauthorized', 'execution_plan': {'targe"
+    },
+    {
+      "timestamp": "2026-05-25T13:49:08.665899+00:00",
+      "test": "duplicate_trace_replay",
+      "reason": "Handled deterministically",
+      "payload_summary": "{'trace_id': 'trace_duplicate_test', 'status': 'completed', 'hash': 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "test_suite": "concurrent_replay",
+  "timestamp": "2026-05-23T13:28:02.952620+00:00",
+  "objective": "Prove replay integrity under concurrency",
+  "tests": [
+    {
+      "test_name": "concurrent_trace_execution",
+      "description": "Execute 10+ traces simultaneously",
+      "expected": "ALL_COMPLETE_WITHOUT_COLLISION",
+      "passed": true,
+      "traces_executed": 15,
+      "collision_detected": false,
+      "errors": []
+    },
+    {
+      "test_name": "replay_ordering",
+      "description": "Validate artifact chain ordering under replay",
+      "expected": "CORRECT_ORDER_MAINTAINED",
+      "passed": true,
+      "ordering_violations": [],
+      "errors": []
+    },
+    {
+      "test_name": "hash_consistency_under_load",
+      "description": "Validate hash consistency when recomputed",
+      "expected": "HASHES_MATCH_ON_RECOMPUTE",
+      "passed": true,
+      "hash_mismatches": [],
+      "errors": []
+    },
+    {
+      "test_name": "conflict_safe_writes",
+      "description": "Validate no write conflicts during concurrent execution",
+      "expected": "NO_WRITE_CONFLICTS",
+      "passed": true,
+      "write_conflicts": [],
+      "errors": [],
+      "total_artifacts_written": 60
+    },
+    {
+      "test_name": "partial_replay_recovery",
+      "description": "Validate replay can recover from partial state",
+      "expected": "RECOVERY_SUCCESSFUL",
+      "passed": true,
+      "recovery_scenarios": [
+        {
+          "trace_id": "trace_concurrent_000",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_001",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_002",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_003",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_004",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_005",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_006",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_007",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_008",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_009",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_010",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_013",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_012",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_011",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        },
+        {
+          "trace_id": "trace_concurrent_014",
+          "partial_depth": 2,
+          "parent_linkage_valid": true,
+          "can_reconstruct": true
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "concurrent_replay_integrity": true,
+  "total_traces_tested": 15,
+  "hash_registry_size": 60
+}

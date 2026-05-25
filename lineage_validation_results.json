@@ -1,0 +1,195 @@
+{
+  "test_suite": "lineage_validation",
+  "timestamp": "2025-01-15T00:00:00Z",
+  "test_cases": [
+    {
+      "name": "valid_chain",
+      "report": {
+        "chain_valid": true,
+        "tests": {
+          "trace_id_consistency": {
+            "test": "trace_id_consistency",
+            "passed": true,
+            "errors": [],
+            "trace_id": "inst_test_12345"
+          },
+          "parent_linkage": {
+            "test": "parent_linkage",
+            "passed": true,
+            "errors": []
+          },
+          "hash_integrity": {
+            "test": "hash_integrity",
+            "passed": true,
+            "errors": []
+          },
+          "schema_version_presence": {
+            "test": "schema_version_presence",
+            "passed": true,
+            "errors": []
+          },
+          "no_undeclared_fields": {
+            "test": "no_undeclared_fields",
+            "passed": true,
+            "errors": []
+          },
+          "deterministic_serialization": {
+            "test": "deterministic_serialization",
+            "passed": true,
+            "errors": []
+          },
+          "canonical_type_sequence": {
+            "test": "canonical_type_sequence",
+            "passed": true,
+            "errors": []
+          }
+        },
+        "errors": [],
+        "artifacts_validated": 2
+      }
+    },
+    {
+      "name": "trace_id_mismatch",
+      "report": {
+        "chain_valid": false,
+        "tests": {
+          "trace_id_consistency": {
+            "test": "trace_id_consistency",
+            "passed": false,
+            "errors": [
+              "Trace ID inconsistency: found 2 different trace_ids: {'inst_test_12345', 'DIFFERENT_TRACE_ID'}"
+            ]
+          },
+          "parent_linkage": {
+            "test": "parent_linkage",
+            "passed": true,
+            "errors": []
+          },
+          "hash_integrity": {
+            "test": "hash_integrity",
+            "passed": true,
+            "errors": []
+          },
+          "schema_version_presence": {
+            "test": "schema_version_presence",
+            "passed": true,
+            "errors": []
+          },
+          "no_undeclared_fields": {
+            "test": "no_undeclared_fields",
+            "passed": true,
+            "errors": []
+          },
+          "deterministic_serialization": {
+            "test": "deterministic_serialization",
+            "passed": true,
+            "errors": []
+          },
+          "canonical_type_sequence": {
+            "test": "canonical_type_sequence",
+            "passed": true,
+            "errors": []
+          }
+        },
+        "errors": [],
+        "artifacts_validated": 2
+      }
+    },
+    {
+      "name": "parent_hash_mismatch",
+      "report": {
+        "chain_valid": false,
+        "tests": {
+          "trace_id_consistency": {
+            "test": "trace_id_consistency",
+            "passed": true,
+            "errors": [],
+            "trace_id": "inst_test_12345"
+          },
+          "parent_linkage": {
+            "test": "parent_linkage",
+            "passed": false,
+            "errors": [
+              "Parent hash mismatch for artifact_blueprint_def45678: expected d855c4c025ca126b2df4e55acf16be235b2d0d2beef4589180369fb37eef1945, got INVALID_HASH"
+            ]
+          },
+          "hash_integrity": {
+            "test": "hash_integrity",
+            "passed": true,
+            "errors": []
+          },
+          "schema_version_presence": {
+            "test": "schema_version_presence",
+            "passed": true,
+            "errors": []
+          },
+          "no_undeclared_fields": {
+            "test": "no_undeclared_fields",
+            "passed": true,
+            "errors": []
+          },
+          "deterministic_serialization": {
+            "test": "deterministic_serialization",
+            "passed": true,
+            "errors": []
+          },
+          "canonical_type_sequence": {
+            "test": "canonical_type_sequence",
+            "passed": true,
+            "errors": []
+          }
+        },
+        "errors": [],
+        "artifacts_validated": 2
+      }
+    },
+    {
+      "name": "missing_schema_version",
+      "report": {
+        "chain_valid": false,
+        "tests": {
+          "trace_id_consistency": {
+            "test": "trace_id_consistency",
+            "passed": true,
+            "errors": [],
+            "trace_id": "inst_test_12345"
+          },
+          "parent_linkage": {
+            "test": "parent_linkage",
+            "passed": true,
+            "errors": []
+          },
+          "hash_integrity": {
+            "test": "hash_integrity",
+            "passed": true,
+            "errors": []
+          },
+          "schema_version_presence": {
+            "test": "schema_version_presence",
+            "passed": false,
+            "errors": [
+              "Artifact artifact_blueprint_def45678 missing schema_version"
+            ]
+          },
+          "no_undeclared_fields": {
+            "test": "no_undeclared_fields",
+            "passed": true,
+            "errors": []
+          },
+          "deterministic_serialization": {
+            "test": "deterministic_serialization",
+            "passed": true,
+            "errors": []
+          },
+          "canonical_type_sequence": {
+            "test": "canonical_type_sequence",
+            "passed": true,
+            "errors": []
+          }
+        },
+        "errors": [],
+        "artifacts_validated": 2
+      }
+    }
+  ]
+}
